@@ -1,0 +1,1 @@
+# django-cafe-manager
