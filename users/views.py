@@ -36,7 +36,8 @@ class RegisterAPIView(APIView):
             res.set_cookie("refresh", refresh_token, httponly=True)
             
             return res
-        return CustomResponse(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return CustomResponse(data=serializer.errors, message="유효성검사 실패", status=status.HTTP_400_BAD_REQUEST)
     
 
 class AuthAPIView(APIView):
