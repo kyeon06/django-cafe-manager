@@ -162,3 +162,5 @@ cython_debug/
 # add
 my_settings.py
 migrations
+
+프로젝트기록.md
