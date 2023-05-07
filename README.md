@@ -146,3 +146,118 @@
     "data": null
 }
 ```
+
+<br>
+
+### **6. 상품 검색 기능**
+- url path : `/product/search?keyword=라떼`
+- 요청방식 : `GET`
+- response example
+```
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 6,
+            "category": "non-coffee",
+            "price": 3300,
+            "cost": 3300,
+            "name": "곡물라떼",
+            "description": "곡물라떼",
+            "barcode": "7436852619303",
+            "expiration_date": "2030-12-31",
+            "size": "L"
+        },
+        {
+            "id": 7,
+            "category": "non-coffee",
+            "price": 3500,
+            "cost": 3500,
+            "name": "더블초코라떼",
+            "description": "더블초코라떼",
+            "barcode": "7436852619304",
+            "expiration_date": "2030-12-31",
+            "size": "L"
+        }
+    ]
+}
+```
+<br>
+
+### **7. 회원 가입**
+- url path : `/user/register/`
+- 요청방식 : `POST`
+- request example
+```
+{
+    "phone_number" : "010-2222-3333",
+    "password" : "@Testuser3"
+}
+```
+- response example
+```
+{
+    "meta": {
+        "code": 200,
+        "message": "회원가입 완료"
+    },
+    "data": {
+        "user": {
+            "id": 9,
+            "password": "",
+            "last_login": null,
+            "phone_number": "010-2222-3333",
+            "is_active": true,
+            "is_admin": false
+        },
+        "token": {
+            "access": "",
+            "refresh": ""
+        }
+    }
+}
+```
+<br>
+
+### **8. 로그인**
+- url path : `/user/auth/`
+- 요청방식 : `POST`
+- response example
+```
+{
+    "meta": {
+        "code": 200,
+        "message": "로그인 성공"
+    },
+    "data": {
+        "user": {
+            "id": 9,
+            "password": "",
+            "last_login": null,
+            "phone_number": "010-2222-3333",
+            "is_active": true,
+            "is_admin": false
+        },
+        "token": {
+            "access": "",
+            "refresh": ""
+        }
+    }
+}
+```
+<br>
+
+### **9. 로그아웃**
+- url path : `/user/auth/`
+- 요청방식 : `DELETE`
+- response example
+```
+{
+    "meta": {
+        "code": 202,
+        "message": "로그아웃 완료"
+    },
+    "data": null
+}
+```
