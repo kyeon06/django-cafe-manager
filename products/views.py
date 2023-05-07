@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import CursorPagination
@@ -7,6 +8,8 @@ from .serializers import ProductSerializer
 from cafe_manager.custom_response import CustomResponse
 from rest_framework.response import Response
 from .models import Product
+
+from urllib import parse
 
 
 class ProductAPIView(APIView):
@@ -70,3 +73,21 @@ class ProductAPIView(APIView):
             
             except Product.DoesNotExist:
                 return CustomResponse(message="상품 정보가 존재하지 않습니다.",status=status.HTTP_404_NOT_FOUND)
+            
+from hangul_utils import split_syllables, join_jamos
+from django.db.models import Q
+
+class ProductSearchAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+
+    # 상품 검색
+    def get(self, request):
+        keyword = self.request.GET.get('keyword', '')
+
+        if keyword:
+            queryset = Product.objects.filter(name__contains=keyword)
+            
+            serializer = self.serializer_class(queryset, many=True)
+            return CustomResponse(data=serializer.data, message="검색 성공", status=status.HTTP_200_OK)
+        else:
+            return CustomResponse(data=None, message="검색 키워드를 입력해주세요", status=status.HTTP_400_BAD_REQUEST)
