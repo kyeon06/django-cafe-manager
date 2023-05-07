@@ -55,3 +55,18 @@ class ProductAPIView(APIView):
                 serializer.save()
                 return CustomResponse(data=serializer.data, status=status.HTTP_200_OK)
             return CustomResponse(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    # 상품 삭제
+    def delete(self, request, **kwags):
+        if kwags.get('pk') is None:
+            return CustomResponse(data=None, message="잘못된 요청입니다.", status=status.HTTP_400_BAD_REQUEST)
+        else:
+
+            try:
+                product_id = kwags.get('pk')
+                product_object = Product.objects.get(id=product_id)
+                product_object.delete()
+                return CustomResponse(message="삭제가 완료되었습니다.", status=status.HTTP_200_OK)
+            
+            except Product.DoesNotExist:
+                return CustomResponse(message="상품 정보가 존재하지 않습니다.",status=status.HTTP_404_NOT_FOUND)
