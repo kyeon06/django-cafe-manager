@@ -11,29 +11,49 @@ from .models import Product
 
 from urllib import parse
 
+# Pagination
+class ProductCursorPagination(CursorPagination):
+    page_size = 10
+    ordering = 'category'
+    cursor_query_param = 'cursor'
 
+# 상품 목록 조회
+class ProductListAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+    pagination_class = ProductCursorPagination
+    queryset = Product.objects.all()
+
+    def get(self, request, **kwags):
+        queryset = Product.objects.all()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.serializer_class(queryset, many=True)
+        return CustomResponse(data=serializer.data, status=status.HTTP_200_OK)
+
+# 상품 상세
 class ProductAPIView(APIView):
+    serializer_class = ProductSerializer
 
     # 상품 조회
     def get(self, request, **kwags):
-
         if kwags.get('pk') is None:
-            queryset = Product.objects.all()
-            serializer = ProductSerializer(queryset, many=True)
-            return CustomResponse(data=serializer.data, status=status.HTTP_200_OK)
+            return CustomResponse(message="잘못된 요청입니다.", status=status.HTTP_400_BAD_REQUEST)
         else:
 
             try:    
                 product_id = kwags.get('pk')
                 product_object = Product.objects.get(id=product_id)
-                serializer = ProductSerializer(product_object)
+                serializer = self.serializer_class(product_object)
                 return CustomResponse(data=serializer.data, status=status.HTTP_200_OK)
             except Product.DoesNotExist:
                 return CustomResponse(message="상품 정보가 존재하지 않습니다.",status=status.HTTP_404_NOT_FOUND)
 
     # 상품 등록
     def post(self, request):
-        serializer = ProductSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -53,7 +73,7 @@ class ProductAPIView(APIView):
             except Product.DoesNotExist:
                 return CustomResponse(message="상품 정보가 존재하지 않습니다.",status=status.HTTP_404_NOT_FOUND)
             
-            serializer = ProductSerializer(product_object, data=request.data, partial=True)
+            serializer = self.serializer_class(product_object, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return CustomResponse(data=serializer.data, status=status.HTTP_200_OK)
@@ -74,11 +94,12 @@ class ProductAPIView(APIView):
             except Product.DoesNotExist:
                 return CustomResponse(message="상품 정보가 존재하지 않습니다.",status=status.HTTP_404_NOT_FOUND)
             
-from hangul_utils import split_syllables, join_jamos
-from django.db.models import Q
-
+# 상품 검색 조회
 class ProductSearchAPIView(ListAPIView):
     serializer_class = ProductSerializer
+    pagination_class = ProductCursorPagination
+    queryset = Product.objects.all()
+
 
     # 상품 검색
     def get(self, request):
@@ -86,6 +107,11 @@ class ProductSearchAPIView(ListAPIView):
 
         if keyword:
             queryset = Product.objects.filter(name__contains=keyword)
+            page = self.paginate_queryset(queryset)
+
+            if page is not None:
+                serializer = self.serializer_class(page, many=True)
+                return self.get_paginated_response(serializer.data)
             
             serializer = self.serializer_class(queryset, many=True)
             return CustomResponse(data=serializer.data, message="검색 성공", status=status.HTTP_200_OK)
