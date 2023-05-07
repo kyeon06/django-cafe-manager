@@ -22,6 +22,6 @@ class Product(models.Model):
     cost = models.IntegerField() # 원가
     name = models.CharField(max_length=100) # 상품명
     description = models.TextField() # 상품설명
-    barcode = models.CharField(max_length=50) # 바코드
+    barcode = models.CharField(max_length=50, unique=True) # 바코드
     expiration_date = models.DateField() # 유통기한
     size = models.CharField(max_length=1, choices=SIZE_CHOICES) # 사이즈
