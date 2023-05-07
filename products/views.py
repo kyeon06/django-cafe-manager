@@ -1,15 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import CursorPagination
 from rest_framework import status
 from .serializers import ProductSerializer
 from cafe_manager.custom_response import CustomResponse
-from rest_framework.response import Response
 from .models import Product
-
-from urllib import parse
 
 # Pagination
 class ProductCursorPagination(CursorPagination):
@@ -19,6 +15,7 @@ class ProductCursorPagination(CursorPagination):
 
 # 상품 목록 조회
 class ProductListAPIView(ListAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ProductSerializer
     pagination_class = ProductCursorPagination
     queryset = Product.objects.all()
@@ -35,6 +32,7 @@ class ProductListAPIView(ListAPIView):
 
 # 상품 상세
 class ProductAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ProductSerializer
 
     # 상품 조회
@@ -96,6 +94,7 @@ class ProductAPIView(APIView):
             
 # 상품 검색 조회
 class ProductSearchAPIView(ListAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ProductSerializer
     pagination_class = ProductCursorPagination
     queryset = Product.objects.all()
@@ -114,6 +113,7 @@ class ProductSearchAPIView(ListAPIView):
                 return self.get_paginated_response(serializer.data)
             
             serializer = self.serializer_class(queryset, many=True)
+            
             return CustomResponse(data=serializer.data, message="검색 성공", status=status.HTTP_200_OK)
         else:
             return CustomResponse(data=None, message="검색 키워드를 입력해주세요", status=status.HTTP_400_BAD_REQUEST)
